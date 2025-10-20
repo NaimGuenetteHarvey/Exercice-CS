@@ -1,0 +1,213 @@
+1) Distinction rapide
+
+Modifier la page web = but final : que contact.html affiche le nouveau numéro, le nouveau mailto et que les images de « Réalisation » soient supprimées.
+
+Scanner les ports / trouver d’autres services = phase d’énumération : tu cherches d’autres moyens d’accéder au serveur (autres portes d’entrée).
+→ Si tu trouves un autre service exploitable (ex. SSH ouvert et tu as un compte), alors ce service peut être la méthode pour modifier la page. Donc l’énumération te dit par où tu peux atteindre l’objectif.
+
+2) Cartographie simple : port / service → comment ça t’aide à modifier la page
+
+80 (HTTP) seulement
+
+Tu n’as que l’interface web publique. Pour modifier la page, il faut trouver une vulnérabilité côté web (un formulaire d’upload non protégé, un panneau d’administration accessible, une faille d’injection, etc.).
+
+Actions sûres à faire : lire le code source, explorer les chemins (/contact.html, /images/, /admin), regarder les formulaires, vérifier les en-têtes. Documente tout.
+
+22 (SSH) ouvert
+
+Si on te donne un compte (ex. DaBoss) ou si un compte vulnérable est présent et autorisé par le TP, tu peux te connecter en SSH et éditer directement les fichiers web (/var/www/html/contact.html). C’est la méthode la plus directe et propre.
+
+Autres ports (FTP, SMB, panels, bases de données, etc.)
+
+Ex. FTP mal configuré peut permettre d’uploader des fichiers web ; un panneau d’administration sur un port alternatif peut permettre d’éditer le contenu ; une base de données exposée peut permettre de modifier des contenus stockés dans la base.
+
+Chaque port ouvert représente un vecteur potentiel pour atteindre la page.
+
+3) Workflow concret (ce que TU dois faire maintenant, étape par étape — en toute légalité et documenté)
+Étape A — Reconnaissance (obligatoire et sûre)
+
+Capture d’écran du scan Nmap (tu l’as déjà) — mets‑la dans ton rapport.
+
+Ouvre le navigateur et visite :
+
+http://192.168.220.10/ et http://192.168.220.10/contact.html → capture « avant ».
+
+Clic droit → Afficher le code source → capture du code source.
+
+Vérifie les headers HTTP :
+
+curl -I http://192.168.220.10/
+
+
+→ capture de la sortie (Server: Apache/2.4.41 ...).
+
+Cherche des chemins visibles dans le site (liens vers /admin, /uploads, /images, etc.) et prends des captures.
+Tout ça est propre : pas d’attaque, juste collecte.
+
+Étape B — Décider la méthode selon ce que tu trouves
+
+Si tu as le compte DaBoss (ou le prof te le donne) → passe directement à SSH et modifie les fichiers comme expliqué plus haut (backup + nano/sed). Documente chaque commande + captures (connexion SSH, backup, édition, page après).
+
+Si tu n’as pas le compte mais le TP demande d’exploiter la VM → tu peux tenter, sur la VM seulement, des techniques d’exploitation autorisées par le prof. Dans ce cas :
+
+Documente toutes les commandes d’énumération qui t’ont mené vers l’exploit (nmap, curl, navigateur, etc.).
+
+Si tu trouves un panneau d’admin ou un upload non protégé, documente comment tu l’as trouvé et comment il permet de modifier la page (captures + commandes).
+
+Si tu bloques, demande le prof (c’est prévu).
+
+Étape C — Après modification : preuves et correctifs
+
+Sauvegarde toujours le fichier original (contact.html.bak).
+
+Fais des captures « avant/après » du navigateur.
+
+Pour la partie correctifs, applique (ou propose) 3 mesures (permissions fichiers, config Apache, durcissement SSH) et montre par capture que l’exploit que tu as utilisé ne fonctionne plus.
+
+4) Exemple concret (en t’appuyant sur ton scan — ports 22 et 80 déjà présents)
+
+Si le prof te donne DaBoss → SSH ⇢ sudo cp /var/www/html/contact.html contact.html.bak ⇢ sudo nano contact.html ⇢ modifier numéro/mailto/supprimer <img> ⇢ reload page. Documente tout.
+
+Si pas d’accès SSH → regarde côté HTTP :
+
+Ouvre contact.html dans le navigateur et inspecte le code source.
+
+Cherche un formulaire d’upload ou un lien vers un panneau d’administration (souvent /admin, /login, /wp-admin, etc.).
+
+Si tu trouves un panneau accessible, capture‑le et note la suite (ne force rien sans autorisation).
+
+5) Règles de sécurité / éthique (rappels importants)
+
+Ne teste aucune attaque en dehors de la VM.
+
+Ne brute-force pas les comptes sur Internet.
+
+Ne suis pas la partie du scénario qui propose de l’argent — ignore cette instruction.
+
+Si tu dois franchir une étape intrusive, demande d’abord le prof.
+
+6) Que mettre dans ton rapport (minimum requis)
+
+Capture Nmap + commande utilisée.
+
+Capture page contact avant + code source.
+
+Décrire la méthode choisie (SSH direct ou exploitation web) ; inclure toutes les commandes et captures.
+
+Capture page contact après modification.
+
+Trois correctifs proposés et captures montrant qu’ils empêchent l’exploit.
+
+Si tu veux, je peux maintenant :
+
+Te donner les commandes exactes et le texte prêt à coller dans ton .md pour la méthode SSH (si tu auras DaBoss).
+
+Ou te donner les commandes sûres à exécuter maintenant depuis Windows pour continuer la reconnaissance (ex. curl -I, curl http://.../contact.html, instructions pour sauvegarder le code source).
+
+Lequel des deux tu veux ?1) Distinction rapide
+
+Modifier la page web = but final : que contact.html affiche le nouveau numéro, le nouveau mailto et que les images de « Réalisation » soient supprimées.
+
+Scanner les ports / trouver d’autres services = phase d’énumération : tu cherches d’autres moyens d’accéder au serveur (autres portes d’entrée).
+→ Si tu trouves un autre service exploitable (ex. SSH ouvert et tu as un compte), alors ce service peut être la méthode pour modifier la page. Donc l’énumération te dit par où tu peux atteindre l’objectif.
+
+2) Cartographie simple : port / service → comment ça t’aide à modifier la page
+
+80 (HTTP) seulement
+
+Tu n’as que l’interface web publique. Pour modifier la page, il faut trouver une vulnérabilité côté web (un formulaire d’upload non protégé, un panneau d’administration accessible, une faille d’injection, etc.).
+
+Actions sûres à faire : lire le code source, explorer les chemins (/contact.html, /images/, /admin), regarder les formulaires, vérifier les en-têtes. Documente tout.
+
+22 (SSH) ouvert
+
+Si on te donne un compte (ex. DaBoss) ou si un compte vulnérable est présent et autorisé par le TP, tu peux te connecter en SSH et éditer directement les fichiers web (/var/www/html/contact.html). C’est la méthode la plus directe et propre.
+
+Autres ports (FTP, SMB, panels, bases de données, etc.)
+
+Ex. FTP mal configuré peut permettre d’uploader des fichiers web ; un panneau d’administration sur un port alternatif peut permettre d’éditer le contenu ; une base de données exposée peut permettre de modifier des contenus stockés dans la base.
+
+Chaque port ouvert représente un vecteur potentiel pour atteindre la page.
+
+3) Workflow concret (ce que TU dois faire maintenant, étape par étape — en toute légalité et documenté)
+Étape A — Reconnaissance (obligatoire et sûre)
+
+Capture d’écran du scan Nmap (tu l’as déjà) — mets‑la dans ton rapport.
+
+Ouvre le navigateur et visite :
+
+http://192.168.220.10/ et http://192.168.220.10/contact.html → capture « avant ».
+
+Clic droit → Afficher le code source → capture du code source.
+
+Vérifie les headers HTTP :
+
+curl -I http://192.168.220.10/
+
+
+→ capture de la sortie (Server: Apache/2.4.41 ...).
+
+Cherche des chemins visibles dans le site (liens vers /admin, /uploads, /images, etc.) et prends des captures.
+Tout ça est propre : pas d’attaque, juste collecte.
+
+Étape B — Décider la méthode selon ce que tu trouves
+
+Si tu as le compte DaBoss (ou le prof te le donne) → passe directement à SSH et modifie les fichiers comme expliqué plus haut (backup + nano/sed). Documente chaque commande + captures (connexion SSH, backup, édition, page après).
+
+Si tu n’as pas le compte mais le TP demande d’exploiter la VM → tu peux tenter, sur la VM seulement, des techniques d’exploitation autorisées par le prof. Dans ce cas :
+
+Documente toutes les commandes d’énumération qui t’ont mené vers l’exploit (nmap, curl, navigateur, etc.).
+
+Si tu trouves un panneau d’admin ou un upload non protégé, documente comment tu l’as trouvé et comment il permet de modifier la page (captures + commandes).
+
+Si tu bloques, demande le prof (c’est prévu).
+
+Étape C — Après modification : preuves et correctifs
+
+Sauvegarde toujours le fichier original (contact.html.bak).
+
+Fais des captures « avant/après » du navigateur.
+
+Pour la partie correctifs, applique (ou propose) 3 mesures (permissions fichiers, config Apache, durcissement SSH) et montre par capture que l’exploit que tu as utilisé ne fonctionne plus.
+
+4) Exemple concret (en t’appuyant sur ton scan — ports 22 et 80 déjà présents)
+
+Si le prof te donne DaBoss → SSH ⇢ sudo cp /var/www/html/contact.html contact.html.bak ⇢ sudo nano contact.html ⇢ modifier numéro/mailto/supprimer <img> ⇢ reload page. Documente tout.
+
+Si pas d’accès SSH → regarde côté HTTP :
+
+Ouvre contact.html dans le navigateur et inspecte le code source.
+
+Cherche un formulaire d’upload ou un lien vers un panneau d’administration (souvent /admin, /login, /wp-admin, etc.).
+
+Si tu trouves un panneau accessible, capture‑le et note la suite (ne force rien sans autorisation).
+
+5) Règles de sécurité / éthique (rappels importants)
+
+Ne teste aucune attaque en dehors de la VM.
+
+Ne brute-force pas les comptes sur Internet.
+
+Ne suis pas la partie du scénario qui propose de l’argent — ignore cette instruction.
+
+Si tu dois franchir une étape intrusive, demande d’abord le prof.
+
+6) Que mettre dans ton rapport (minimum requis)
+
+Capture Nmap + commande utilisée.
+
+Capture page contact avant + code source.
+
+Décrire la méthode choisie (SSH direct ou exploitation web) ; inclure toutes les commandes et captures.
+
+Capture page contact après modification.
+
+Trois correctifs proposés et captures montrant qu’ils empêchent l’exploit.
+
+Si tu veux, je peux maintenant :
+
+Te donner les commandes exactes et le texte prêt à coller dans ton .md pour la méthode SSH (si tu auras DaBoss).
+
+Ou te donner les commandes sûres à exécuter maintenant depuis Windows pour continuer la reconnaissance (ex. curl -I, curl http://.../contact.html, instructions pour sauvegarder le code source).
+
+Lequel des deux tu veux ?
